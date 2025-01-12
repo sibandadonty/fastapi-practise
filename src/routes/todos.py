@@ -9,8 +9,8 @@ router = APIRouter(
 )
 
 @router.post("/")
-def create_todo(todo: TodoBase, session: SessionDep):
-    return db_todos.create_todo(todo)
+def create_todo(todo: Todo, session: SessionDep):
+    return db_todos.create_todo(todo, session)
 
 @router.get("/")
 def get_todos(session: SessionDep):
@@ -22,7 +22,7 @@ def get_todos(id: int, session: SessionDep):
 
 @router.patch("/{id}")
 def update_todo(id: int, todo_data: TodoUpdate, session: SessionDep):
-    db_todos.update_todo(id, todo_data, session)
+    return db_todos.update_todo(id, todo_data, session)
 
 @router.delete("/{id}")
 def get_todos(id: int, session: SessionDep):
