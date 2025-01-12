@@ -13,4 +13,4 @@ class TodoUpdate(SQLModel):
 class Todo(TodoBase, table=True):
     id: int | None = Field(default=None, index=True, primary_key=True)
     isComplete: bool = Field(default=False)
-    created_at: DateTime = Field(default=datetime.utcnow())
+    created_at: datetime = Field(default=datetime.utcnow())

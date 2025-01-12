@@ -14,8 +14,13 @@ def get_todo(id: int, session: Session):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Todo Not Found")
     return db_todo
 
-def get_dotos(session: Session):
-    stmt = select(Todo)
+# def get_dotos(session: Session):
+#     stmt = select(Todo)
+#     todos = session.exec(stmt).all()
+#     return todos
+
+def get_todos(session: Session):
+    stmt = select(Todo).offset(0).limit(30)
     todos = session.exec(stmt).all()
     return todos
 
