@@ -29,7 +29,7 @@ def update_task(id: int, update_data: UpdateTask, session: Session):
     db_task.sqlmodel_update(task)
     session.add(db_task)
     session.commit()
-    session.refresh()
+    session.refresh(db_task)
     return db_task
 
 def delete_task(id: int, session: Session):
@@ -37,4 +37,5 @@ def delete_task(id: int, session: Session):
     if not db_task:
         raise not_found_exception
     session.delete(db_task)
+    session.commit()
     return {"ok": True}
