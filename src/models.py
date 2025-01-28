@@ -5,3 +5,9 @@ class Task(SQLModel, table=True):
     title: str
     description: str
     isDone: bool
+
+class UpdateTask(SQLModel):
+    title: str | None = None
+    description: str | None = None
+    isDone: bool | None = None
+    
