@@ -3,6 +3,8 @@ from jose import JWTError, jwt
 from datetime import datetime, timezone, timedelta
 from fastapi.security import OAuth2PasswordBearer
 from sqlmodel import Session
+from src.utils.db_users import get_user
+from src.db.database import SessionDep
 
 SECRET = "dcb46dee3838803b00b1c2fa22f49b13fd6ac723c3228e503d44f217e20e6429"
 ALGORITHM = "HS256"
@@ -21,7 +23,7 @@ def create_access_token(data: dict, expire_delta: timedelta | None = None):
     encoded_jwt = jwt.encode(to_encode, SECRET, ALGORITHM)
     return encoded_jwt
 
-def get_current_user(session: Session, token: str = Depends(oauth2_scheme)):
+def get_current_user(session: SessionDep, token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_400_BAD_REQUEST,
         detail="Could not validate credentials",
@@ -36,3 +38,10 @@ def get_current_user(session: Session, token: str = Depends(oauth2_scheme)):
     except JWTError:
         raise credentials_exception
     
+    db_user = get_user(id, session)
+    if not db_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    return db_user

@@ -19,4 +19,3 @@ class Users(SQLModel, table=True):
 
 class UpdateUser(SQLModel):
     username: str | None = None
-    password: str | None = None
