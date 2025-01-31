@@ -14,7 +14,7 @@ class UpdateTask(SQLModel):
 
 class Users(SQLModel, table=True):
     id: int | None = Field(None, primary_key=True, index=True)
-    username: str
+    username: str = Field(..., unique=True, index=True)
     password: str
 
 class UpdateUser(SQLModel):

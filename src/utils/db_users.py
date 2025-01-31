@@ -27,6 +27,13 @@ def get_all_users(session: Session):
     users = session.exec(stmt).all()
     return users
 
+def get_user_by_username(username: str, session: Session):
+    stmt = select(Users).where(Users.username == username)
+    db_user = session.exec(stmt).first()
+    if not db_user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    return db_user
+
 def update_user(id: int, updated_data: UpdateUser, session:Session):
     db_user = session.get(Users, id)
     if not db_user:
