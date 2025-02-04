@@ -1,6 +1,7 @@
 from src.models import Users, UpdateUser
 from fastapi import status, HTTPException, Depends
 from sqlmodel import Session, select
+from datetime import datetime
 
 from src.utils.passwords import hash_password
 
@@ -11,6 +12,7 @@ not_found_exception = HTTPException(
 
 def create_user(user_data: Users, session: Session):
     user_data.password = hash_password(user_data.password)
+    user_data.created_at = datetime.utcnow()
     session.add(user_data)
     session.commit()
     session.refresh(user_data)

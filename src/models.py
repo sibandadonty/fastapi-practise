@@ -1,4 +1,6 @@
+from typing import Optional
 from sqlmodel import Field, SQLModel
+from datetime import datetime
 
 class Task(SQLModel, table=True):
     id: int | None = Field(None, primary_key=True, index=True)
@@ -16,6 +18,7 @@ class Users(SQLModel, table=True):
     id: int | None = Field(None, primary_key=True, index=True)
     username: str = Field(..., unique=True, index=True)
     password: str
+    created_at: Optional[datetime] = None
 
 class UpdateUser(SQLModel):
     username: str | None = None
