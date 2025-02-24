@@ -7,7 +7,6 @@ from src.utils.db_users import get_user_by_email
 from src.utils.hash import verify_password
 
 router = APIRouter(
-    prefix="/auth",
     tags=["Authentication"]
 )
 
@@ -20,7 +19,7 @@ def login(session: SessionDep, form_data: OAuth2PasswordRequestForm = Depends())
             detail="Invalid email or password"
         )
     
-    if verify_password(form_data.password, db_user.password):
+    if not verify_password(form_data.password, db_user.password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid email or password"
