@@ -2,6 +2,7 @@ from sqlmodel import Session, select
 from src.models import Users, UpdateUser
 from datetime import datetime, timezone
 from fastapi import status, HTTPException
+from src.utils.hash import hash_password
 
 not_found_exp = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
@@ -10,10 +11,18 @@ not_found_exp = HTTPException(
 
 def create_user(user_data: Users, session: Session):
     user_data.created_at = datetime.now(timezone.utc)
+    user_data.password = hash_password(user_data.password)
     session.add(user_data)
     session.commit()
     session.refresh(user_data)
     return user_data
+
+def get_user_by_email(email: str, session: Session):
+    stmt = select(Users).where(Users.email == email)
+    db_user = session.exec(stmt).first()
+    if not db_user:
+        raise not_found_exp
+    return db_user
 
 def get_all_users(session: Session):
     stmt = select(Users)

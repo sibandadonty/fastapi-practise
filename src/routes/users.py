@@ -16,6 +16,10 @@ def create_user(user_data: Users, session: SessionDep):
 def get_all_users(session: SessionDep):
     return db_users.get_all_users(session)
 
+@router.get("/email/{email}")
+def get_user_by_email(email: str, session: SessionDep):
+    return db_users.get_user_by_email(email, session)
+
 @router.get("/{id}")
 def get_user(id: int, session: SessionDep):
     return db_users.get_user(id, session)
