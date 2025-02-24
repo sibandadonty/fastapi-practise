@@ -1,7 +1,8 @@
 from src.utils import db_users
 from src.db.database import SessionDep
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Depends, status
 from src.models import Users, UpdateUser
+from src.auth import get_current_user, oauth2_scheme
 
 router = APIRouter(
     prefix="/users",
@@ -21,7 +22,7 @@ def get_user_by_email(email: str, session: SessionDep):
     return db_users.get_user_by_email(email, session)
 
 @router.get("/{id}")
-def get_user(id: int, session: SessionDep):
+def get_user(id: int, session: SessionDep, current_user: dict = Depends(get_current_user)):
     return db_users.get_user(id, session)
 
 @router.patch("/{id}", status_code=status.HTTP_201_CREATED)

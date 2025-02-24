@@ -4,6 +4,7 @@ from jose import JWTError, jwt
 from datetime import datetime, timezone, timedelta
 from fastapi.security import OAuth2PasswordBearer
 from sqlmodel import Session
+from src.db.database import SessionDep
 from src.utils.db_users import get_user_by_email
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
@@ -22,19 +23,20 @@ def create_access_token(data: dict, expire_delta: Optional[timedelta] = None):
     token = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return token
 
-def verify_token(session: Session, token: str = Depends(oauth2_scheme)):
+def get_current_user(session: SessionDep, token: str = Depends(oauth2_scheme)):
     unathorized_exp = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail={"WWW-Authenticate": "Bearer"}
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
-        if not payload:
+        email = payload.get("email")
+        if not email:
             raise unathorized_exp
     except JWTError:
         raise unathorized_exp
     
-    db_user = get_user_by_email(payload.email, session)
+    db_user = get_user_by_email(email, session)
 
     if not db_user:
         raise HTTPException(

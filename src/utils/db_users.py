@@ -20,6 +20,7 @@ def create_user(user_data: Users, session: Session):
 def get_user_by_email(email: str, session: Session):
     stmt = select(Users).where(Users.email == email)
     db_user = session.exec(stmt).first()
+    print("db user from the source: ", db_user)
     if not db_user:
         raise not_found_exp
     return db_user
