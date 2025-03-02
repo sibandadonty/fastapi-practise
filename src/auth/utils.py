@@ -17,7 +17,7 @@ def create_access_token(user_data: dict, expiry: timedelta = None, refresh: bool
     payload = {}
 
     payload["user"] = user_data
-    payload["exp"] = datetime.now() + expiry if expiry is not None else timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_TIME)
+    payload["exp"] = datetime.now() + (expiry if expiry is not None else timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_TIME))
     payload["jti"] = str(uuid.uuid4())
     payload["refresh"] = refresh
 

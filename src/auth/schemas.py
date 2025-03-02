@@ -19,3 +19,7 @@ class UserCreateModel(BaseModel):
     last_name: str
     username: str
     password: str
+
+class UserLoginModel(BaseModel):
+    email: str
+    password: str
