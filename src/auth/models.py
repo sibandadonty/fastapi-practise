@@ -7,12 +7,12 @@ class User(SQLModel, table=True):
     __tablename__ = "users"
     uid: uuid.UUID = Field(
         sa_column=Column(
-            pg.UUID ,
+            pg.UUID,
             primary_key=True,
             nullable=False,
             default=uuid.uuid4
         )
-    ),
+    )
     email: str
     username: str
     first_name: str
