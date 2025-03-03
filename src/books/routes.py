@@ -4,9 +4,12 @@ from src.books.services import BookServices
 from src.db.main import get_session
 from typing import List
 from sqlalchemy.ext.asyncio.session import AsyncSession
+from src.auth.dependencies import AccessTokenBearer
 
 book_router = APIRouter()
 book_services = BookServices()
+access_token_bearer = AccessTokenBearer()
+
 
 not_found_exp = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
@@ -19,7 +22,7 @@ async def create_book(book_data: BookCreateModel, session: AsyncSession =Depends
     return book
 
 @book_router.get("/", response_model=List[Book])
-async def get_all_books(session: AsyncSession = Depends(get_session)):
+async def get_all_books(session: AsyncSession = Depends(get_session), user_details = Depends(access_token_bearer)):
     books = await book_services.get_all_books(session)
     return books
 
