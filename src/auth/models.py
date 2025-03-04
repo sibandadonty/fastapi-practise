@@ -15,6 +15,13 @@ class User(SQLModel, table=True):
     )
     email: str
     username: str
+    role: str = Field(
+        sa_column=Column(
+            pg.VARCHAR,
+            nullable=False,
+            server_default="user"
+        )
+    )
     first_name: str
     last_name: str
     password: str = Field(exclude=True)

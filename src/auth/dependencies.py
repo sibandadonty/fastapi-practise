@@ -1,3 +1,4 @@
+from typing import List
 from fastapi.security import HTTPBearer
 from src.auth.utils import verify_token
 from fastapi import Depends, status, HTTPException, Request
@@ -71,3 +72,19 @@ async def get_current_user(token_details=  Depends(AccessTokenBearer()), session
     user = await auth_services.get_user_by_email(email, session)
 
     return user
+
+class RoleChecker:
+
+    def __init__(self, allowed_roles: List["str"]):
+        self.allowed_roles = allowed_roles
+
+    def __call__(self, current_user = Depends(get_current_user)):
+        
+        if current_user.role in self.allowed_roles:
+            return True
+        
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not permited to perform this operation"
+        )
+        
