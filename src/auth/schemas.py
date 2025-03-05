@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List
 import uuid
 from pydantic import BaseModel, Field
-from src.books.models import Books
+from src.db.models import Books
 
 class UserModel(BaseModel):
     uid: uuid.UUID

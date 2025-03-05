@@ -3,7 +3,7 @@ from sqlmodel import select, desc
 from .schemas import BookCreateModel, BookUpdateModel
 from src.db.main import get_session
 from sqlalchemy.ext.asyncio.session import AsyncSession
-from src.books.models import Books
+from src.db.models import Books
 
 class BookServices:
 
