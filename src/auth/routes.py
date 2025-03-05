@@ -87,7 +87,7 @@ async def create_new_access_token(user_details = Depends(RefreshTokenBearer())):
         detail="Token is invalid or expired"
     )
 
-@auth_router.get("/me")
+@auth_router.get("/me", response_model=UserModel)
 async def get_current_user(user = Depends(get_current_user), _ = Depends(role_checker)):
     return user
 
