@@ -7,12 +7,13 @@ from src.books.models import Books
 
 class BookServices:
 
-    async def create_book(self, book_data: BookCreateModel, session: AsyncSession):
+    async def create_book(self, book_data: BookCreateModel, user_uid: str ,session: AsyncSession):
         book = book_data.model_dump()
         new_book = Books(
             **book
         )
         new_book.published_date = datetime.strptime(book_data.published_date, "%Y-%m-%d")
+        new_book.user_uid = user_uid
         session.add(new_book)
         await session.commit()
         return new_book
@@ -25,6 +26,11 @@ class BookServices:
     
     async def get_all_books(self, session: AsyncSession):
         statement = select(Books).order_by(desc(Books.created_at))
+        results = await session.execute(statement)
+        return results.scalars().all()
+    
+    async def get_user_books(self, user_uid: str, session: AsyncSession):
+        statement = select(Books).where(Books.user_uid == user_uid).order_by(desc(Books.created_at))
         results = await session.execute(statement)
         return results.scalars().all()
     

@@ -18,13 +18,18 @@ not_found_exp = HTTPException(
 )
 
 @book_router.post("/", response_model=Book, status_code=status.HTTP_201_CREATED, dependencies=[role_checker])
-async def create_book(book_data: BookCreateModel, session: AsyncSession =Depends(get_session)):
-    book = await book_services.create_book(book_data, session)
+async def create_book(book_data: BookCreateModel, session: AsyncSession =Depends(get_session), user_details = Depends(access_token_bearer)):
+    book = await book_services.create_book(book_data, user_details["user"]["uid"] ,session)
     return book
 
 @book_router.get("/", response_model=List[Book], dependencies=[role_checker])
 async def get_all_books(session: AsyncSession = Depends(get_session), user_details = Depends(access_token_bearer)):
     books = await book_services.get_all_books(session)
+    return books
+
+@book_router.get("/user/{user_uid}", response_model=List[Book], dependencies=[role_checker])
+async def get_all_books(user_uid: str, session: AsyncSession = Depends(get_session), user_details = Depends(access_token_bearer)):
+    books = await book_services.get_user_books(user_uid,session)
     return books
 
 @book_router.get("/{book_uid}", response_model=Book, dependencies=[role_checker])
