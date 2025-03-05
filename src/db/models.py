@@ -52,3 +52,21 @@ class User(SQLModel, table=True):
     created_at: datetime = Field(sa_column=Column(pg.TIMESTAMP, default=datetime.now))
     updated_at: datetime = Field(sa_column=Column(pg.TIMESTAMP, default=datetime.now))
     books: List["Books"] = Relationship(back_populates="user", sa_relationship_kwargs={"lazy": "selectin"})
+
+class Review(SQLModel, table=True):
+    __tablename__ = "reviews"
+    uid: uuid.UUID = Field(
+        sa_column=Column(
+            pg.UUID,
+            primary_key=True,
+            nullable=False,
+            default=uuid.uuid4
+        )
+    )
+    rating: int
+    review_text: str
+    user_uid: uuid.UUID = Field(default=None, foreign_key="users.uid")
+    book_uid: uuid.UUID = Field(default=None, foreign_key="books.uid")
+    created_at: datetime = Field(sa_column=Column(pg.TIMESTAMP, default=datetime.now))
+    updated_at: datetime = Field(sa_column=Column(pg.TIMESTAMP, default=datetime.now))
+    user: Optional["User"] = Relationship(back_populates="books")
