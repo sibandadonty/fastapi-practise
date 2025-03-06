@@ -6,6 +6,10 @@ from src.db.redis import token_in_blocklist
 from src.db.main import get_session
 from src.auth.services import AuthServices
 from sqlalchemy.ext.asyncio.session import AsyncSession
+from src.errors import (
+    AccessTokenRequired,
+    RefreshTokenRequired
+)
 
 auth_services = AuthServices()
 
@@ -53,18 +57,12 @@ class TokenBearer(HTTPBearer):
 class AccessTokenBearer(TokenBearer):
     def verify_token_data(self, token_data: dict):
         if token_data and token_data["refresh"]:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Please provide an access token"
-            )
+            raise AccessTokenRequired()
         
 class RefreshTokenBearer(TokenBearer):
     def verify_token_data(self, token_data: dict):
         if token_data and not token_data["refresh"]:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Please provide a refresh token"
-            )
+            raise RefreshTokenRequired()
 
 async def get_current_user(token_details=  Depends(AccessTokenBearer()), session: AsyncSession = Depends(get_session)):
     email = token_details["user"]["email"]

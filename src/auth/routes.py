@@ -1,6 +1,6 @@
 from datetime import timedelta, datetime
 from fastapi import Depends, HTTPException, status, APIRouter
-from src.auth.schemas import UserCreateModel, UserModel, UserLoginModel
+from src.auth.schemas import UserBooksModel, UserCreateModel, UserModel, UserLoginModel
 from src.db.main import get_session
 from .services import AuthServices
 from sqlalchemy.ext.asyncio.session import AsyncSession
@@ -87,7 +87,7 @@ async def create_new_access_token(user_details = Depends(RefreshTokenBearer())):
         detail="Token is invalid or expired"
     )
 
-@auth_router.get("/me", response_model=UserModel)
+@auth_router.get("/me", response_model=UserBooksModel)
 async def get_current_user(user = Depends(get_current_user), _ = Depends(role_checker)):
     return user
 

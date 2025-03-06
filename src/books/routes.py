@@ -5,6 +5,9 @@ from src.db.main import get_session
 from typing import List
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from src.auth.dependencies import AccessTokenBearer, RoleChecker
+from src.errors import (
+    BookNotFound
+)
 
 book_router = APIRouter()
 book_services = BookServices()
@@ -36,7 +39,7 @@ async def get_all_books(user_uid: str, session: AsyncSession = Depends(get_sessi
 async def get_book(book_uid: str, session: AsyncSession = Depends(get_session)):
     book = await book_services.get_book(book_uid, session)
     if not book:
-        raise not_found_exp
+        raise BookNotFound()
     return book
 
 @book_router.patch("/{book_uid}", response_model=Book, dependencies=[role_checker])

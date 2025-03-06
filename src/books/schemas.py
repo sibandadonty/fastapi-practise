@@ -1,6 +1,9 @@
 from datetime import datetime, date
+from typing import List, Optional
 import uuid
 from pydantic import BaseModel
+from src.reviews.schemas import Review 
+from src.auth.schemas import UserModel
 
 class Book(BaseModel):
     uid: uuid.UUID
@@ -13,8 +16,17 @@ class Book(BaseModel):
     created_at: datetime 
     updated_at: datetime 
 
-    # class Config:
-    #     from_attributes = True
+class BookDetailsModel(Book):
+    uid: uuid.UUID
+    rating: int
+    review_text: str
+    user_uid: uuid.UUID 
+    book_uid: uuid.UUID 
+    created_at: datetime 
+    updated_at: datetime 
+    user: UserModel
+    book: Book 
+   
 
 class BookUpdateModel(BaseModel):
     title: str

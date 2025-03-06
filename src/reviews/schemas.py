@@ -5,14 +5,7 @@ from sqlalchemy.dialects import postgresql as pg
 from sqlmodel import Field, Column
 
 class Review(BaseModel):
-    uid: uuid.UUID = Field(
-        sa_column=Column(
-            pg.UUID,
-            primary_key=True,
-            nullable=False,
-            default=uuid.uuid4
-        )
-    )
+    uid: uuid.UUID
     rating: int
     review_text: str
     user_uid: uuid.UUID 

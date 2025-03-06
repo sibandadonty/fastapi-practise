@@ -44,6 +44,7 @@ class ReviewsService:
             session.add(new_review)
             await session.commit()
             await session.refresh(new_review)
+            print("new review: ", new_review)
             return new_review
 
         except Exception as e:
