@@ -1,9 +1,12 @@
 import logging
 import time
-from typing import Any, Callable
-from fastapi import Request, HTTPException, status
+from typing import Any
+from fastapi import HTTPException, status
 from fastapi.responses import JSONResponse
 from fastapi import FastAPI
+from fastapi.requests import Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
 logger = logging.getLogger("uvicorn.access")
 logger.disabled = True
@@ -117,6 +120,19 @@ def register_middleware(app: FastAPI):
         response = await call_next(request)
         processing_time = time.time() - start_time
 
-        print(f"{request.client.host}:{request.client.port} - {request.url.path} - processed after {processing_time}s")
+        print(f"{request.client.host}:{request.client.port} - {request.url.path} - {0} - processed after {processing_time}s")
 
         return response
+    
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_methods=["*"],
+        allow_headers=["*"],
+        allow_credentials = True,
+    )
+
+    app.add_middleware(
+        TrustedHostMiddleware,
+        allowed_hosts=["*"]
+    )
