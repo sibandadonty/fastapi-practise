@@ -28,3 +28,6 @@ class UserCreateModel(BaseModel):
 class UserLoginModel(BaseModel):
     email: str
     password: str
+
+class EmailModel(BaseModel):
+    addresses: List[str]

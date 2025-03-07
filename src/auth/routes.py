@@ -1,6 +1,6 @@
 from datetime import timedelta, datetime
 from fastapi import Depends, HTTPException, status, APIRouter
-from src.auth.schemas import UserBooksModel, UserCreateModel, UserModel, UserLoginModel
+from src.auth.schemas import EmailModel, UserBooksModel, UserCreateModel, UserModel, UserLoginModel
 from src.db.main import get_session
 from .services import AuthServices
 from sqlalchemy.ext.asyncio.session import AsyncSession
@@ -10,11 +10,26 @@ from src.config import settings
 from fastapi.responses import JSONResponse
 from .dependencies import RefreshTokenBearer, AccessTokenBearer, get_current_user, RoleChecker
 from src.db.redis import add_jti_to_blocklist
-
+from src.mail import mail, create_message
 
 auth_router = APIRouter()
 auth_services = AuthServices()
 role_checker = RoleChecker(["admin", "user"])
+
+@auth_router.post("/send_mail")
+async def send_mail(emails: EmailModel):
+    message = create_message(
+        recipients=emails.addresses,
+        subject="welcome",
+        body="<h1>Welcome to the app<h1>"
+    )
+     
+    await mail.send_message(message)
+
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content="email sent successfully"
+    )
 
 @auth_router.post("/signup", response_model=UserModel, status_code=status.HTTP_201_CREATED)
 async def create_user(user_data: UserCreateModel, session: AsyncSession = Depends(get_session)):
