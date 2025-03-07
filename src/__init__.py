@@ -7,11 +7,8 @@ from src.books.routes import book_router
 from src.auth.routes import auth_router
 from src.reviews.routes import review_router
 from src.errors import (
-    BookNotFound,
-    RefreshTokenRequired,
-    AccessTokenRequired,
-    create_exception_handler,
-    register_error_handlers
+    register_error_handlers,
+    register_middleware
 )
 
 @asynccontextmanager
@@ -29,9 +26,9 @@ app = FastAPI(
     lifespan=life_span
 )
 
-
-
 register_error_handlers(app)
+register_middleware(app)
+
 app.include_router(book_router, prefix=f"/api/{version}/books", tags=["Books"])
 app.include_router(auth_router, prefix=f"/api/{version}/users", tags=["Auth"])
 app.include_router(review_router, prefix=f"/api/{version}/reviews", tags=["Reviews"])

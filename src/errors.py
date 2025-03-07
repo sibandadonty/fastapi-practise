@@ -1,8 +1,12 @@
+import logging
+import time
 from typing import Any, Callable
 from fastapi import Request, HTTPException, status
 from fastapi.responses import JSONResponse
 from fastapi import FastAPI
 
+logger = logging.getLogger("uvicorn.access")
+logger.disabled = True
 
 class BooklyException(Exception):
     """This is the base class for all bookly errors"""
@@ -103,3 +107,16 @@ def register_error_handlers(app: FastAPI):
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content="Ooop something went wrong with the server"
         )
+    
+def register_middleware(app: FastAPI):
+
+    @app.middleware("http")
+    async def request_handler(request: Request, call_next):
+        start_time = time.time()
+
+        response = await call_next(request)
+        processing_time = time.time() - start_time
+
+        print(f"{request.client.host}:{request.client.port} - {request.url.path} - processed after {processing_time}s")
+
+        return response
