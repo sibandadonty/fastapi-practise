@@ -28,3 +28,12 @@ class AuthServices:
         await session.commit()
         await session.refresh(new_user)        
         return new_user
+    
+    async def update_user(self,update_data: dict, user: User, session: AsyncSession):
+
+        for k,v in update_data.items():
+            setattr(user, k, v)
+
+        await session.commit()
+        await session.refresh(user)
+        return user

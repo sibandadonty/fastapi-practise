@@ -2,6 +2,7 @@ from datetime import timedelta, datetime
 from fastapi import Depends, HTTPException, status, APIRouter
 from src.auth.schemas import EmailModel, UserBooksModel, UserCreateModel, UserModel, UserLoginModel
 from src.db.main import get_session
+from src.errors import UserNotFound
 from .services import AuthServices
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from .utils import create_access_token
@@ -32,6 +33,31 @@ async def send_mail(emails: EmailModel):
         content="email sent successfully"
     )
 
+
+@auth_router.get("/verify/{token}")
+async def verify_email(token: str, session: AsyncSession = Depends(get_session)):
+    token_data = decode_url_safe_token(token)
+    user_email = token_data.get("email")
+
+    if user_email:
+        user = await auth_services.get_user_by_email(user_email, session)
+
+        if not user:
+            raise UserNotFound()
+            
+        await auth_services.update_user({"is_verified": True}, user, session)
+
+        return JSONResponse(
+            content={"message": "Account verified successfully"},
+            status_code=status.HTTP_200_OK,
+        )
+
+    return JSONResponse(
+        content={"message": "Error occured during verification"},
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+    )
+
+
 @auth_router.post("/signup", status_code=status.HTTP_201_CREATED)
 async def create_user(user_data: UserCreateModel, session: AsyncSession = Depends(get_session)):
     user_exist = await auth_services.user_exist(user_data.email, session)
@@ -43,7 +69,7 @@ async def create_user(user_data: UserCreateModel, session: AsyncSession = Depend
     user = await auth_services.create_user(user_data, session)
     token = create_url_safe_token({"email": user_data.email})
 
-    link = f"http://{settings.DOMAIN}/api/v1/auth/verifiy/{token}"
+    link = f"http://{settings.DOMAIN}/api/v1/users/verify/{token}"
 
     html_message = f"""
     <h1>Verify your email</h1>
