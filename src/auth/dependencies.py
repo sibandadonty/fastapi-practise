@@ -2,12 +2,14 @@ from typing import List
 from fastapi.security import HTTPBearer
 from src.auth.utils import verify_token
 from fastapi import Depends, status, HTTPException, Request
+from src.db.models import User
 from src.db.redis import token_in_blocklist
 from src.db.main import get_session
 from src.auth.services import AuthServices
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from src.errors import (
     AccessTokenRequired,
+    AccountNotVerified,
     RefreshTokenRequired
 )
 
@@ -76,8 +78,10 @@ class RoleChecker:
     def __init__(self, allowed_roles: List["str"]):
         self.allowed_roles = allowed_roles
 
-    def __call__(self, current_user = Depends(get_current_user)):
-        
+    def __call__(self, current_user: User = Depends(get_current_user)):
+        if not current_user.is_verified:
+            raise AccountNotVerified()
+
         if current_user.role in self.allowed_roles:
             return True
         

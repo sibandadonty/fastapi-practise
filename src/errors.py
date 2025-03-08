@@ -8,6 +8,7 @@ from fastapi.requests import Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
+
 logger = logging.getLogger("uvicorn.access")
 logger.disabled = True
 
@@ -59,6 +60,10 @@ class UserNotFound(BooklyException):
     """User Not found"""
     pass
 
+class AccountNotVerified(BooklyException):
+    """Account not yet verified"""
+    pass
+
 def create_exception_handler(status_code: int, initial_detail: Any):
 
     async def exception_handler(request: Request, exe: Exception):
@@ -88,6 +93,18 @@ def register_error_handlers(app: FastAPI):
                 "message": "Please provide a valid access token",
                 "resolution": "Please get an access token",
                 "error_code": "access_token_required",
+            },
+        ),
+    )
+
+    app.add_exception_handler(
+        AccountNotVerified,
+        create_exception_handler(
+            status_code=status.HTTP_403_FORBIDDEN,
+            initial_detail={
+                "message": "account not yet verified",
+                "resolution": "Check you email for account verification instructions",
+                "error_code": "account_not_verified",
             },
         ),
     )
