@@ -11,6 +11,7 @@ from fastapi.responses import JSONResponse
 from .dependencies import RefreshTokenBearer, AccessTokenBearer, get_current_user, RoleChecker
 from src.db.redis import add_jti_to_blocklist
 from src.mail import mail, create_message
+from .utils import hash_password, create_url_safe_token, decode_url_safe_token
 
 auth_router = APIRouter()
 auth_services = AuthServices()
@@ -31,7 +32,7 @@ async def send_mail(emails: EmailModel):
         content="email sent successfully"
     )
 
-@auth_router.post("/signup", response_model=UserModel, status_code=status.HTTP_201_CREATED)
+@auth_router.post("/signup", status_code=status.HTTP_201_CREATED)
 async def create_user(user_data: UserCreateModel, session: AsyncSession = Depends(get_session)):
     user_exist = await auth_services.user_exist(user_data.email, session)
     if user_exist:
@@ -40,7 +41,27 @@ async def create_user(user_data: UserCreateModel, session: AsyncSession = Depend
             detail="User with email already exist"
         )
     user = await auth_services.create_user(user_data, session)
-    return user
+    token = create_url_safe_token({"email": user_data.email})
+
+    link = f"http://{settings.DOMAIN}/api/v1/auth/verifiy/{token}"
+
+    html_message = f"""
+    <h1>Verify your email</h1>
+    <p>Click this <a href={link}>link</a> to verify</p>
+    """
+    
+    message = create_message(
+        recipients=[user_data.email],
+        subject="Verify your email",
+        body=html_message
+    )
+     
+    await mail.send_message(message)
+
+    return {
+        "message": "Account created successfully! now open you email and verify your account",
+        "user": user
+    }
 
 @auth_router.post("/login")
 async def login_user(user_login_data: UserLoginModel, session: AsyncSession = Depends(get_session)):
