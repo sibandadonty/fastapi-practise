@@ -29,11 +29,20 @@ class AuthServices:
         await session.refresh(new_user)        
         return new_user
     
-    async def update_user(self,update_data: dict, user: User, session: AsyncSession):
+    # async def update_user(self,update_data: dict, user: User, session: AsyncSession):
 
-        for k,v in update_data.items():
+    #     for k,v in update_data.items():
+    #         setattr(user.model_dump(), k, v)
+
+    #     await session.commit()
+    #     await session.refresh(user)
+    #     return user
+    
+    async def update_user(self, user:User , user_data: dict,session:AsyncSession):
+
+        for k, v in user_data.items():
             setattr(user, k, v)
 
         await session.commit()
-        await session.refresh(user)
+
         return user

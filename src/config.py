@@ -24,3 +24,8 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=DOTENV, extra="ignore")
 
 settings = Settings()
+
+# Celery configuration
+broker_url = settings.REDIS_URL
+result_backend = settings.REDIS_URL
+broker_connection_retry_on_startup = True
