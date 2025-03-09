@@ -23,6 +23,12 @@ app = FastAPI(
     version=version,
     title="Bookly",
     description="AN API for books",
+    redoc_url=f"/api/{version}/redoc",
+    docs_url=f"/api/{version}/docs",
+    contact={
+        "email": "sibandadonty@gmail.com",
+        "phone_number": "039249220424"
+    },
     lifespan=life_span
 )
 

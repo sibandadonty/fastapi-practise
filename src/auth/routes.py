@@ -13,6 +13,7 @@ from .dependencies import RefreshTokenBearer, AccessTokenBearer, get_current_use
 from src.db.redis import add_jti_to_blocklist
 from src.mail import mail, create_message
 from .utils import hash_password, create_url_safe_token, decode_url_safe_token
+from src.celery_tasks import send_the_email
 
 auth_router = APIRouter()
 auth_services = AuthServices()
@@ -20,13 +21,12 @@ role_checker = RoleChecker(["admin", "user"])
 
 @auth_router.post("/send_mail")
 async def send_mail(emails: EmailModel):
-    message = create_message(
-        recipients=emails.addresses,
-        subject="welcome",
-        body="<h1>Welcome to the app<h1>"
-    )
-     
-    await mail.send_message(message)
+    emails = emails.addresses
+
+    html = "<h1>Welcome to the app</h1>"
+    subject = "Welcome to our app"
+
+    send_the_email.delay(emails, subject, html)
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
@@ -138,18 +138,16 @@ async def create_user(user_data: UserCreateModel, bg_task: BackgroundTasks, sess
 
     link = f"http://{settings.DOMAIN}/api/v1/users/verify/{token}"
 
-    html_message = f"""
+    html = f"""
     <h1>Verify your email</h1>
     <p>Click this <a href={link}>link</a> to verify</p>
     """
     
-    message = create_message(
-        recipients=[user_data.email],
-        subject="Verify your email",
-        body=html_message
-    )
-     
-    bg_task.add_task(mail.send_message, message)
+    emails = [user_data.email]
+
+    subject = "Verify Your email"
+
+    send_the_email.delay(emails, subject, html) # changed to this
 
     return {
         "message": "Account created successfully! now open you email and verify your account",
