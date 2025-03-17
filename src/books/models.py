@@ -3,7 +3,7 @@ import sqlalchemy.dialects.postgresql as pg
 from datetime import date, datetime
 import uuid
 
-class User(SQLModel, table=True):
+class Book(SQLModel, table=True):
     __tablename__ = "users"
     uid: uuid.UUID = Field(
         sa_column=Column(
@@ -11,7 +11,8 @@ class User(SQLModel, table=True):
             primary_key=True,
             index=True,
             nullable=False,
-            unique=True
+            unique=True,
+            default=uuid.uuid4
         )
     )
     title: str

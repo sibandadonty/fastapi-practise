@@ -1,13 +1,15 @@
 from pydantic import BaseModel
 
-class Book(BaseModel):
-    id: int
+class CreateBookModel(BaseModel):
     title: str
     author: str
     publisher: str
     published_date: str
     page_count: int
     language: str
+
+class Book(CreateBookModel):
+    id: int
 
 class BookUpdateModel(BaseModel):
     title: str
