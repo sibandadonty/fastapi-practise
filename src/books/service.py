@@ -22,7 +22,7 @@ class BookService:
     async def get_all_books(self, session: AsyncSession):
         statement = select(Book).order_by(desc(Book.created_at))
         results = await session.execute(statement)
-        books = results.scalars()
+        books = results.scalars().all()
         return books
     
     async def get_book(self, book_uid: str, session: AsyncSession):
@@ -52,6 +52,7 @@ class BookService:
 
         if db_book is not None:
             await session.delete(db_book)
+            await session.commit()
             return {}
         else:
-            return None       
+            return None
