@@ -4,7 +4,7 @@ from datetime import date, datetime
 import uuid
 
 class Book(SQLModel, table=True):
-    __tablename__ = "users"
+    __tablename__ = "books"
     uid: uuid.UUID = Field(
         sa_column=Column(
             pg.UUID,
