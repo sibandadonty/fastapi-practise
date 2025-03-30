@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from src.db.main import init_db
+from src.books.routes import club_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -9,12 +10,13 @@ async def lifespan(app: FastAPI):
     yield
     print("Server Stopping.....")
 
+version = "v1"
+
 app = FastAPI(
     title="Clubly",
     description="Information about footaball clubs",
+    version=version,
     lifespan=lifespan
 )
 
-@app.get("/")
-async def root():
-    return {"message": "hello world!"}
+app.include_router(club_router, prefix=f"/api/{version}/clubs", tags=["Clubs"])

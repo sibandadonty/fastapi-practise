@@ -18,4 +18,4 @@ class Club(SQLModel, table=True):
     location: str
     position: int
     ucl_trophies_number: int
-    created_at: datetime = Field(sa_column=Column(pg.TIMESTAMP, default=func.now))
+    created_at: datetime = Field(sa_column=Column(pg.TIMESTAMP, default=datetime.now))

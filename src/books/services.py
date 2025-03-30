@@ -11,7 +11,7 @@ class ClubService:
 
         session.add(new_club)
         await session.commit()
-        await session.refresh()
+        await session.refresh(new_club)
         
         return new_club
     
@@ -30,7 +30,7 @@ class ClubService:
     async def update_club(self, club_uid: str, club_update_data: UpdateClubModel, session: AsyncSession):
         club_to_update = await self.get_club(club_uid, session)
 
-        if club_to_update:
+        if club_to_update is not None:
             club_update_data_dict = club_update_data.model_dump()
 
             for k,v in club_update_data_dict.items():
