@@ -2,7 +2,7 @@ from sqlmodel import SQLModel
 import uuid
 from datetime import datetime
 
-class Club(SQLModel):
+class ClubModel(SQLModel):
     uid: uuid.UUID
     name: str
     location: str
