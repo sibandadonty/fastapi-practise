@@ -17,4 +17,4 @@ class User(SQLModel, table=True):
     username: str
     email: str
     password: str
-    created_at = Field(sa_column=Column(pg.TIMESTAMP, default=datetime.now))
+    created_at: datetime = Field(sa_column=Column(pg.TIMESTAMP, default=datetime.now))

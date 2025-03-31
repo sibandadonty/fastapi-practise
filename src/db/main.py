@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from src.config import Config
 from sqlalchemy.orm import sessionmaker
-from src.books.models import Club
+from src.clubs.models import Club
 
 async_engine = AsyncEngine(create_engine(Config.DATABASE_URL))
 
