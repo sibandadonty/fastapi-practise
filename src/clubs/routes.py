@@ -5,9 +5,11 @@ from .schemas import ClubModel, UpdateClubModel, CreateClubModel
 from src.db.main import get_session
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from typing import List
+from src.auth.dependencies import AccessTokenBearer
 
 club_router = APIRouter()
 club_service = ClubService()
+access_token_bearer = AccessTokenBearer()
 
 not_found_exp = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
@@ -15,7 +17,8 @@ not_found_exp = HTTPException(
 )
 
 @club_router.get("/", response_model=List[ClubModel])
-async def get_all_clubs(session: AsyncSession = Depends(get_session)):
+async def get_all_clubs(session: AsyncSession = Depends(get_session), token_details: dict = Depends(access_token_bearer)):
+    print(token_details)
     return await club_service.get_all_clubs(session)
 
 @club_router.post("/", status_code=status.HTTP_201_CREATED, response_model=Club)
