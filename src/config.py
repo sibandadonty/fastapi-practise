@@ -5,7 +5,7 @@ env_path = path.join(path.dirname(__file__), ".env")
 
 class Settings(BaseSettings):
     DATABASE_URL: str
-    JWT_SECRET: set
+    JWT_SECRET: str
     JWT_ALGORITHM: str
 
     model_config = SettingsConfigDict(
