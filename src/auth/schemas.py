@@ -2,6 +2,10 @@ from sqlmodel import SQLModel
 import uuid
 from datetime import datetime
 
+class LoginModel(SQLModel):
+    email: str
+    password: str
+
 class CreateUserModel(SQLModel):
     username: str
     email: str

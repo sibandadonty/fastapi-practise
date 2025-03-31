@@ -12,7 +12,7 @@ def create_access_token(user_data: dict, expiry: Optional[timedelta] = None, ref
         payload={
            "user": user_data,
            "jti": str(uuid.uuid4()),
-           "exp": (datetime.now() + expiry if expiry is not None else timedelta(minutes=TOKEN_EXPIRY_TIME)),
+           "exp": datetime.now() + (expiry if expiry is not None else timedelta(minutes=TOKEN_EXPIRY_TIME)),
            "refresh": refresh 
         },
         algorithm=Config.JWT_ALGORITHM,
