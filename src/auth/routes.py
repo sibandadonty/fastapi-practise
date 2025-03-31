@@ -9,6 +9,7 @@ from src.auth.auth import create_access_token
 from datetime import datetime, timedelta
 from fastapi.responses import JSONResponse
 from src.auth.dependencies import RefreshTokenBearer, AccessTokenBearer
+from src.auth.redis import add_token_to_blocklist
 
 auth_router = APIRouter()
 auth_service = AuthService()
@@ -77,4 +78,16 @@ async def get_new_access_token(token_details: dict = Depends(refresh_token_beare
     raise HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
         detail="Invalid or expired token"
+    )
+
+@auth_router.get("/logout")
+async def logut_user(token_details: dict = Depends(access_token_bearer)):
+
+    jti = token_details['jti']
+
+    await add_token_to_blocklist(jti)
+
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content="Logged out successfully"
     )
