@@ -11,7 +11,6 @@ class AuthService:
         statement = select(User).where(User.email == email)
         result = await session.execute(statement)
         user = result.scalar()
-        print("User By Email Result: ", user)
         return user
     
     async def user_exist(self, email: str, session: AsyncSession):

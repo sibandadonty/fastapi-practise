@@ -14,6 +14,8 @@ class CreateUserModel(SQLModel):
 class UpdateUserModel(SQLModel):
     pass
 
-class UserModel(CreateUserModel):
+class UserModel(SQLModel):
     uid: uuid.UUID
     created_at: datetime
+    username: str
+    email: str

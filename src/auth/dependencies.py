@@ -1,7 +1,12 @@
 from fastapi.security import HTTPBearer
-from fastapi import Request, HTTPException, status
+from fastapi import Depends, Request, HTTPException, status
 from src.auth.auth import decode_token
 from src.auth.redis import token_in_blocklist
+from src.auth.services import AuthService
+from sqlalchemy.ext.asyncio.session import AsyncSession
+from src.db.main import get_session
+
+auth_services = AuthService()
 
 class TokenBearer(HTTPBearer):
 
@@ -58,3 +63,12 @@ class RefreshTokenBearer(TokenBearer):
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Please provide a valid refresh token"
             )
+        
+async def get_current_user(
+        token_details: dict = Depends(AccessTokenBearer()),
+        session: AsyncSession = Depends(get_session)):
+    user_email = token_details["user"]["email"]
+    
+    user = await auth_services.get_user_by_email(user_email, session)
+
+    return user

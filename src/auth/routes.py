@@ -8,7 +8,7 @@ from src.auth.utils import verify_password
 from src.auth.auth import create_access_token
 from datetime import datetime, timedelta
 from fastapi.responses import JSONResponse
-from src.auth.dependencies import RefreshTokenBearer, AccessTokenBearer
+from src.auth.dependencies import RefreshTokenBearer, AccessTokenBearer, get_current_user
 from src.auth.redis import add_token_to_blocklist
 
 auth_router = APIRouter()
@@ -91,3 +91,7 @@ async def logut_user(token_details: dict = Depends(access_token_bearer)):
         status_code=status.HTTP_200_OK,
         content="Logged out successfully"
     )
+
+@auth_router.get("/me")
+async def get_current_loggedin_user(user: UserModel =Depends(get_current_user)):
+    return user
