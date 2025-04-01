@@ -19,3 +19,4 @@ class UserModel(SQLModel):
     created_at: datetime
     username: str
     email: str
+    role: str

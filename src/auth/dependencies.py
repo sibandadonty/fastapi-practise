@@ -81,4 +81,10 @@ class RoleChecker:
         self.allowed_roles = allowed_roles
 
     def __call__(self, current_user: UserModel = Depends(get_current_user)):
-        pass
+        if current_user.roles in self.allowed_roles:
+            return True
+        
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User not allowed to perform this operation"
+        )
