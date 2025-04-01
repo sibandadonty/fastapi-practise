@@ -2,9 +2,11 @@ from fastapi.security import HTTPBearer
 from fastapi import Depends, Request, HTTPException, status
 from src.auth.auth import decode_token
 from src.auth.redis import token_in_blocklist
+from src.auth.schemas import UserModel
 from src.auth.services import AuthService
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from src.db.main import get_session
+from typing import List
 
 auth_services = AuthService()
 
@@ -72,3 +74,11 @@ async def get_current_user(
     user = await auth_services.get_user_by_email(user_email, session)
 
     return user
+
+class RoleChecker:
+
+    def __init__(self, allowed_roles: List[str]):
+        self.allowed_roles = allowed_roles
+
+    def __call__(self, current_user: UserModel = Depends(get_current_user)):
+        pass
