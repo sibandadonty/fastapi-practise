@@ -1,6 +1,9 @@
+from typing import List
 from sqlmodel import SQLModel
 import uuid
 from datetime import datetime
+
+from src.clubs.schemas import ClubModel
 
 class LoginModel(SQLModel):
     email: str
@@ -19,4 +22,7 @@ class UserModel(SQLModel):
     created_at: datetime
     username: str
     email: str
-    role: str
+    roles: str
+
+class UserBooksModel(UserModel):
+    clubs: List[ClubModel]

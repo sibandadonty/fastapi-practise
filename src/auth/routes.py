@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from .services import AuthService
 from sqlalchemy.ext.asyncio.session import AsyncSession
-from src.auth.schemas import CreateUserModel, UpdateUserModel, UserModel, LoginModel
+from src.auth.schemas import CreateUserModel, UpdateUserModel, UserModel, LoginModel, UserBooksModel
 from src.auth.models import User
 from src.db.main import get_session
 from src.auth.utils import verify_password
@@ -94,6 +94,6 @@ async def logut_user(token_details: dict = Depends(access_token_bearer)):
         content="Logged out successfully"
     )
 
-@auth_router.get("/me", dependencies=[role_checker])
+@auth_router.get("/me", dependencies=[role_checker], response_model=UserBooksModel)
 async def get_current_loggedin_user(user: UserModel =Depends(get_current_user)):
     return user
