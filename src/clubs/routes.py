@@ -23,8 +23,9 @@ async def get_all_clubs(session: AsyncSession = Depends(get_session), token_deta
     return await club_service.get_all_clubs(session)
 
 @club_router.post("/", status_code=status.HTTP_201_CREATED, response_model=Club, dependencies=[role_checker])
-async def create_club(club_data: CreateClubModel, session: AsyncSession = Depends(get_session)):
-    return await club_service.create_club(club_data, session)
+async def create_club(club_data: CreateClubModel, token_details: dict = Depends(access_token_bearer), session: AsyncSession = Depends(get_session)):
+    user_uid = token_details["user"]["uid"]
+    return await club_service.create_club(club_data, user_uid ,session)
 
 @club_router.get("/{club_uid}", response_model=Club, dependencies=[role_checker])
 async def get_club(club_uid: str, session: AsyncSession = Depends(get_session)):

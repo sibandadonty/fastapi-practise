@@ -1,3 +1,4 @@
+from typing import Optional
 from sqlmodel import SQLModel, Field, Column
 from datetime import datetime
 import uuid

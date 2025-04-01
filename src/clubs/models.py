@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 from  sqlmodel import SQLModel, Field, Column, func
 import uuid
 import sqlalchemy.dialects.postgresql as pg
@@ -18,4 +19,5 @@ class Club(SQLModel, table=True):
     location: str
     position: int
     ucl_trophies_number: int
+    user_uid: Optional[uuid.UUID] = Field(default=None, foreign_key="users.uid")
     created_at: datetime = Field(sa_column=Column(pg.TIMESTAMP, default=datetime.now))
