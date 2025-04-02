@@ -4,6 +4,7 @@ from src.db.main import init_db
 from src.clubs.routes import club_router
 from src.auth.routes import auth_router
 from src.errors import register_exception_handlers
+from src.middleware import register_middleware
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -22,6 +23,7 @@ app = FastAPI(
 )
 
 register_exception_handlers(app)
+register_middleware(app)
 
 app.include_router(club_router, prefix=f"/api/{version}/clubs", tags=["Clubs"])
 app.include_router(auth_router, prefix=f"/api/{version}/auth", tags=["Auth"])
