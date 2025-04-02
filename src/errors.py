@@ -1,5 +1,5 @@
 from typing import Any
-from fastapi import Request
+from fastapi import Request, FastAPI, status
 from fastapi.responses import JSONResponse
 
 class ClublyException(Exception):
@@ -38,4 +38,59 @@ def create_exception_handler(status_code: int, initial_details: Any):
     return exception_handler
 
 
-    
+def register_exception_handlers(app: FastAPI):
+
+    app.add_exception_handler(
+        RefreshTokenRequired,
+        create_exception_handler(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            initial_details={
+                "message": "an invalid refresh token",
+                "error_code": "invalid_refresh_token"
+            }
+        )
+    )
+
+    app.add_exception_handler(
+        AccessTokenRequired,
+        create_exception_handler(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            initial_details={
+                "message": "an invalid access token was provided",
+                "error_code": "invalid_access_token"
+            }
+        )
+    )
+
+    app.add_exception_handler(
+        InvalidToken,
+        create_exception_handler(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            initial_details={
+                "message": "the provided token is invalid or expired or revoked",
+                "error_code": "invalid_token"
+            }
+        )
+    )
+
+    app.add_exception_handler(
+        InvalidEmailOrPassword,
+        create_exception_handler(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            initial_details={
+                "message": "the provided email or password is invalid",
+                "error_code": "invalid_credentials"
+            }
+        )
+    )
+
+    app.add_exception_handler(
+        UserAlreadyExist,
+        create_exception_handler(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            initial_details={
+                "message": "the provided email already has an account register",
+                "error_code": "user_already_exist"
+            }
+        )
+    )

@@ -7,6 +7,7 @@ from src.auth.services import AuthService
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from src.db.main import get_session
 from typing import List
+from src.errors import AccessTokenRequired, InvalidToken, RefreshTokenRequired
 
 auth_services = AuthService()
 
@@ -23,16 +24,10 @@ class TokenBearer(HTTPBearer):
         token_data = decode_token(token)
         
         if await token_in_blocklist(token_data['jti']):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="token has been revoked or expired"
-            )
+            raise InvalidToken()
 
         if not self.token_valid(token):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="token expired or invalid"
-            )
+            raise InvalidToken()
         
         self.verify_token_data(token_data)
 
@@ -52,19 +47,13 @@ class TokenBearer(HTTPBearer):
 class AccessTokenBearer(TokenBearer):
     def verify_token_data(self, token_data: dict):
         if token_data and token_data["refresh"]:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Please provide a valid access token"
-            )
+            raise AccessTokenRequired()
         
 class RefreshTokenBearer(TokenBearer):
 
     def verify_token_data(self, token_data: dict):
         if token_data and not token_data["refresh"]:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Please provide a valid refresh token"
-            )
+            raise RefreshTokenRequired()
         
 async def get_current_user(
         token_details: dict = Depends(AccessTokenBearer()),
