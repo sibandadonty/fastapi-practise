@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 
+from src.config import Config
 from src.errors import InvalidEmailOrPassword
 from .services import AuthService
 from sqlalchemy.ext.asyncio.session import AsyncSession
@@ -13,6 +14,7 @@ from fastapi.responses import JSONResponse
 from src.auth.dependencies import RefreshTokenBearer, AccessTokenBearer, RoleChecker, get_current_user
 from src.auth.redis import add_token_to_blocklist
 from src.mail import mail, create_message
+from src.auth.utils import create_url_safe_token
 
 auth_router = APIRouter()
 auth_service = AuthService()
@@ -78,10 +80,33 @@ async def login_user(login_data: LoginModel, session: AsyncSession = Depends(get
         
     raise InvalidEmailOrPassword()
 
-@auth_router.post("/signup", response_model=UserModel)
+@auth_router.post("/signup")
 async def create_user(user_data: CreateUserModel, session: AsyncSession = Depends(get_session)):
     user = await auth_service.create_user(user_data, session)
-    return user
+    
+    email = user.email
+    
+    token = create_url_safe_token({"email": email})
+
+    link = f"http://{Config.DOMAIN}/api/v1/verify/{token}"
+
+    html_message = f"""
+    <h1>Verify your email</h1>
+    <p>Click on this <a href={link}>link</a> to verify your email</p>
+    """
+
+    message = create_message(
+        recipients=[email],
+        subject="Verify your email",
+        body=html_message
+    )
+
+    await mail.send_message(message)
+
+    return {
+        "message": "Account created successfully check you email for an email to verify your account",
+        "user": user
+    }
 
 @auth_router.get("/refresh_token")
 async def get_new_access_token(token_details: dict = Depends(refresh_token_bearer)):
