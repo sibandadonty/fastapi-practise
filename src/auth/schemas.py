@@ -26,3 +26,6 @@ class UserModel(SQLModel):
 
 class UserBooksModel(UserModel):
     clubs: List[ClubModel]
+
+class EmailModel(SQLModel):
+    addresses: List[str]
