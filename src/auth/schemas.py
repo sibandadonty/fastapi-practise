@@ -35,3 +35,10 @@ class UserBooksModel(UserModel):
 
 class EmailModel(SQLModel):
     addresses: List[str]
+
+class PasswordResetRequest(SQLModel):
+    email: str
+
+class PasswordResetConfirm(SQLModel):
+    old_password: str
+    new_password: str
