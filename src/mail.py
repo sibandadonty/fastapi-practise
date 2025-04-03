@@ -1,5 +1,4 @@
 from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
-from src.auth.schemas import EmailModel
 from src.config import Config
 from typing import List
 
@@ -17,11 +16,13 @@ conf = ConnectionConfig(
 
 mail = FastMail(conf)
 
-async def create_message(recipients: EmailModel, subject: str, body: str):
+def create_message(recipients: List[str], subject: str, body: str):
+    
     message = MessageSchema(
-        subject="Fastapi-Mail module",
+        subject=subject,
         recipients=recipients,
         body=body,
-        subtype=MessageType.html)
+        subtype=MessageType.html
+    )
     
     return message

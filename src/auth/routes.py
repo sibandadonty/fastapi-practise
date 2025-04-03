@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from src.errors import InvalidEmailOrPassword
 from .services import AuthService
 from sqlalchemy.ext.asyncio.session import AsyncSession
-from src.auth.schemas import CreateUserModel, UpdateUserModel, UserModel, LoginModel, UserBooksModel
+from src.auth.schemas import CreateUserModel, EmailModel, UpdateUserModel, UserModel, LoginModel, UserBooksModel
 from src.auth.models import User
 from src.db.main import get_session
 from src.auth.utils import verify_password
@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 from fastapi.responses import JSONResponse
 from src.auth.dependencies import RefreshTokenBearer, AccessTokenBearer, RoleChecker, get_current_user
 from src.auth.redis import add_token_to_blocklist
+from src.mail import mail, create_message
 
 auth_router = APIRouter()
 auth_service = AuthService()
@@ -19,6 +20,24 @@ refresh_token_bearer = RefreshTokenBearer()
 access_token_bearer = AccessTokenBearer()
 role_checker = Depends(RoleChecker(["admin", "user"]))
 
+
+@auth_router.post("/send_mail")
+async def send_mail(receipents: EmailModel):
+    body = "<h1>Welcome to my app clubly</h1>"
+    addresses = receipents.addresses
+
+    message = create_message(
+        recipients=addresses,
+        subject="Welcome to Clubly",
+        body=body
+    )
+
+    await mail.send_message(message)
+
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content="Email sent successfully"
+    )
 
 @auth_router.post("/login")
 async def login_user(login_data: LoginModel, session: AsyncSession = Depends(get_session)):
