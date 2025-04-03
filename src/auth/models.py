@@ -18,6 +18,7 @@ class User(SQLModel, table=True):
     )
     username: str
     email: str
+    is_verified: bool = False
     roles: str = Field(sa_column=Column(pg.VARCHAR, server_default="user"))
     clubs: List["Club"] = Relationship(back_populates="user", sa_relationship_kwargs={"lazy": "selectin"})
     password: str

@@ -7,7 +7,6 @@ from fastapi import HTTPException, status
 
 class AuthService:
     
-
     async def get_user_by_email(self, email: str, session: AsyncSession):
         statement = select(User).where(User.email == email)
         result = await session.execute(statement)
@@ -37,4 +36,25 @@ class AuthService:
         await session.refresh(new_user)
         return new_user
     
+    async def get_user(self, user_uid: str, session: AsyncSession):
+        statement = select(User).where(User.uid == user_uid)
+        results = await session.execute(statement)
+        user = results.scalar()
+        return user
+
+    
+    async def update_user(self,user_uid: str, update_data: UpdateUserModel, session: AsyncSession):
+        db_user = await self.get_user(user_uid, session)
+        
+        if db_user:
+            user_data_dict = update_data.model_dump(exclude_unset=True)
+
+            for k,v in user_data_dict.items():
+                setattr(db_user, k, v)
+
+            await session.commit()
+            await session.refresh(db_user)
+            return db_user
+        else:
+            return None
         

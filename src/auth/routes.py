@@ -14,7 +14,7 @@ from fastapi.responses import JSONResponse
 from src.auth.dependencies import RefreshTokenBearer, AccessTokenBearer, RoleChecker, get_current_user
 from src.auth.redis import add_token_to_blocklist
 from src.mail import mail, create_message
-from src.auth.utils import create_url_safe_token
+from src.auth.utils import create_url_safe_token, decode_url_safe_token
 
 auth_router = APIRouter()
 auth_service = AuthService()
@@ -88,7 +88,7 @@ async def create_user(user_data: CreateUserModel, session: AsyncSession = Depend
     
     token = create_url_safe_token({"email": email})
 
-    link = f"http://{Config.DOMAIN}/api/v1/verify/{token}"
+    link = f"http://{Config.DOMAIN}/api/v1/auth/verify/{token}"
 
     html_message = f"""
     <h1>Verify your email</h1>
@@ -140,3 +140,30 @@ async def logut_user(token_details: dict = Depends(access_token_bearer)):
 @auth_router.get("/me", dependencies=[role_checker], response_model=UserBooksModel)
 async def get_current_loggedin_user(user: UserModel =Depends(get_current_user)):
     return user
+
+@auth_router.get("/verify/{token}")
+async def verify_user_account(token: str, session: AsyncSession = Depends(get_session)):
+    toke_data = decode_url_safe_token(token)
+
+    user_email = toke_data.get("email")
+
+    if user_email:
+        db_user = await auth_service.get_user_by_email(user_email, session)
+
+        if not db_user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+        
+        updated_user = await auth_service.update_user(db_user.uid, UpdateUserModel(is_verified=True), session)
+
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content="Account verification successful"
+        )
+
+    raise HTTPException(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        detail="Something went wrong during verification"
+    )

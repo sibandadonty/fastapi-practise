@@ -24,6 +24,12 @@ class UserModel(SQLModel):
     email: str
     roles: str
 
+class UpdateUserModel(SQLModel):
+    username: str | None = None
+    email: str | None = None
+    password: str | None = None
+    is_verified: bool | None = None
+    
 class UserBooksModel(UserModel):
     clubs: List[ClubModel]
 
