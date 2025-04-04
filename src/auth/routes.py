@@ -1,5 +1,4 @@
-from fastapi import APIRouter, Depends, status, HTTPException
-
+from fastapi import APIRouter, Depends, status, HTTPException, BackgroundTasks
 from src.config import Config
 from src.errors import InvalidEmailOrPassword
 from .services import AuthService
@@ -81,7 +80,7 @@ async def login_user(login_data: LoginModel, session: AsyncSession = Depends(get
     raise InvalidEmailOrPassword()
 
 @auth_router.post("/signup")
-async def create_user(user_data: CreateUserModel, session: AsyncSession = Depends(get_session)):
+async def create_user(user_data: CreateUserModel, bg_tasks: BackgroundTasks, session: AsyncSession = Depends(get_session)):
     user = await auth_service.create_user(user_data, session)
     
     email = user.email
@@ -101,7 +100,7 @@ async def create_user(user_data: CreateUserModel, session: AsyncSession = Depend
         body=html_message
     )
 
-    await mail.send_message(message)
+    bg_tasks.add_task(mail.send_message, message)
 
     return {
         "message": "Account created successfully check you email for an email to verify your account",
