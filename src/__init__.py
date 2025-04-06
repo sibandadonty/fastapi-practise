@@ -6,7 +6,7 @@ version = "v1"
 
 @asynccontextmanager
 async def life_span(app: FastAPI):
-    await init_db()
+    # await init_db()
     print("server started....")
     yield
     print("server stopped....")
