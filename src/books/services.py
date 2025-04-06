@@ -11,7 +11,7 @@ class BookService:
 
         new_book = Book(**book_data_dict)
 
-        new_book.published_date = datetime.strftime(new_book.published_date, "%Y-%m-%d")
+        new_book.published_date = datetime.strptime(new_book.published_date, "%Y-%m-%d")
 
         session.add(new_book)
 
@@ -45,7 +45,7 @@ class BookService:
         if db_book is not None:
             book_update_data_dict = book_update_data.model_dump(exclude_unset=True)
 
-            for k,v in book_update_data_dict.keys():
+            for k,v in book_update_data_dict.items():
                 setattr(db_book, k,v)
 
             await session.commit()

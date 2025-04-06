@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from src.db.main import init_db
-
+from src.books.routes import book_router
 version = "v1"
 
 @asynccontextmanager
@@ -18,6 +18,4 @@ app = FastAPI(
     lifespan=life_span
 )
 
-@app.get("/")
-async def root():
-    return {"message": "hello  world"}
+app.include_router(book_router, prefix=f"/api/{version}/books", tags=["Books"])

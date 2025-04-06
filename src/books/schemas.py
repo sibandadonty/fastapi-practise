@@ -6,15 +6,15 @@ class BookCreateModel(SQLModel):
     title: str
     description: str
     author: str
-    published_date: date
+    published_date: str
 
 class BookUpdateModel(SQLModel):
     title: str | None = None
     description: str | None = None
     author: str | None = None
-    published_date: date | None = None
+    published_date: str | None = None
 
 class BookModel(BookCreateModel):
     uid: uuid.UUID
     created_at: datetime 
-
+    published_date: date
