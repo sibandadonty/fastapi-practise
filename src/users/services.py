@@ -5,7 +5,7 @@ from .schemas import UserCreateModel, UserUpdateModel
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from src.auth.utils import hash_password
 
-class UserModel:
+class UserService:
 
     async def get_user_by_email(self, email: str, session: AsyncSession):
         statement = select(User).where(User.email == email)
