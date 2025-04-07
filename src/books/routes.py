@@ -4,9 +4,11 @@ from .schemas import BookCreateModel, BookModel, BookUpdateModel
 from src.db.models import Book
 from src.db.main import get_session
 from sqlalchemy.ext.asyncio.session import AsyncSession
+from src.auth.dependencies import AccessTokenBearer
 
 book_router = APIRouter()
 book_service = BookService()
+access_token_bearer = AccessTokenBearer()
 
 not_found_exp = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND,
@@ -14,7 +16,8 @@ not_found_exp = HTTPException(
 )
 
 @book_router.post("/", response_model=BookModel, status_code=status.HTTP_201_CREATED)
-async def create_book(book_data: BookCreateModel, session: AsyncSession = Depends(get_session)):
+async def create_book(book_data: BookCreateModel, session: AsyncSession = Depends(get_session), token_details: dict = Depends(access_token_bearer)):
+    print("Token Details: ", token_details)
     new_book = await book_service.create_book(book_data, session)
     return new_book
 
