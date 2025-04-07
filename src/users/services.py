@@ -5,11 +5,6 @@ from .schemas import UserCreateModel, UserUpdateModel
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from src.auth.utils import hash_password
 
-not_found_exp = HTTPException(
-    status_code=status.HTTP_404_NOT_FOUND,
-    detail="User not found"
-)
-
 class UserService:
 
     async def get_user_by_email(self, email: str, session: AsyncSession):
