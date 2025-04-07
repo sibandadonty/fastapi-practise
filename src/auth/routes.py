@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 from fastapi import HTTPException, status, Depends, APIRouter
 from fastapi.responses import JSONResponse
 from src.users.services import UserService
@@ -7,9 +7,12 @@ from .schemas import UserLoginModel
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from src.auth.utils import verify_password
 from src.auth.main import create_access_token
+from src.auth.dependencies import AccessTokenBearer, RefreshTokenBearer
 
 auth_router = APIRouter()
 user_service = UserService()
+access_token_bearer = AccessTokenBearer()
+refresh_token_bearer = RefreshTokenBearer()
 
 @auth_router.post("/login")
 async def login_user(login_data: UserLoginModel, session: AsyncSession = Depends(get_session)):
@@ -56,4 +59,22 @@ async def login_user(login_data: UserLoginModel, session: AsyncSession = Depends
         status_code=status.HTTP_400_BAD_REQUEST,
         detail="Invalid username or password"
     )
-       
+
+@auth_router.get("/renew_access_token")
+async def renew_access_token(token_details: dict = Depends(refresh_token_bearer)):
+    expiry_timestamp = token_details["exp"]
+
+    if datetime.fromtimestamp(expiry_timestamp) > datetime.now():
+        new_token = create_access_token(user_data=token_details["user"])
+
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={
+                "access_token": new_token
+            }
+        )
+    
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="Token is invalid or expired"
+    )
