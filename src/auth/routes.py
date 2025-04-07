@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio.session import AsyncSession
 from src.auth.utils import verify_password
 from src.auth.main import create_access_token
 from src.auth.dependencies import AccessTokenBearer, RefreshTokenBearer
+from src.auth.redis import add_token_to_blocklist
 
 auth_router = APIRouter()
 user_service = UserService()
@@ -77,4 +78,18 @@ async def renew_access_token(token_details: dict = Depends(refresh_token_bearer)
     raise HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
         detail="Token is invalid or expired"
+    )
+
+@auth_router.get("/logout")
+async def logout_user(token_details: dict = Depends(access_token_bearer)):
+
+    jti = token_details["jti"]
+
+    await add_token_to_blocklist(jti)
+
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "message": "Logout successful"
+        }
     )

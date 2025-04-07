@@ -22,12 +22,12 @@ async def create_book(book_data: BookCreateModel, session: AsyncSession = Depend
     return new_book
 
 @book_router.get("/")
-async def get_all_books(session: AsyncSession = Depends(get_session)):
+async def get_all_books(session: AsyncSession = Depends(get_session), token_details: dict = Depends(access_token_bearer)):
     books = await book_service.get_all_books(session)
     return books
 
 @book_router.get("/{book_uid}")
-async def get_book(book_uid: str, session: AsyncSession = Depends(get_session)):
+async def get_book(book_uid: str, session: AsyncSession = Depends(get_session), token_details: dict = Depends(access_token_bearer)):
     book = await book_service.get_book(book_uid, session)
 
     if book is None:
@@ -36,7 +36,7 @@ async def get_book(book_uid: str, session: AsyncSession = Depends(get_session)):
     return book
 
 @book_router.patch("/{book_uid}")
-async def update_book(book_uid: str, book_update_data: BookUpdateModel, session: AsyncSession = Depends(get_session)):
+async def update_book(book_uid: str, book_update_data: BookUpdateModel, session: AsyncSession = Depends(get_session), token_details: dict = Depends(access_token_bearer)):
     updated_book = await book_service.update_book(book_uid, book_update_data, session)
 
     if updated_book is None:
@@ -45,7 +45,7 @@ async def update_book(book_uid: str, book_update_data: BookUpdateModel, session:
     return updated_book
 
 @book_router.delete("/{book_uid}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_book(book_uid: str, session: AsyncSession = Depends(get_session)):
+async def delete_book(book_uid: str, session: AsyncSession = Depends(get_session), token_details: dict = Depends(access_token_bearer)):
     result = await book_service.delete_book(book_uid, session)
 
     if result is None:
