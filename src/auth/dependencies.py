@@ -74,5 +74,11 @@ class RoleChecker:
     def __init__(self, allowed_list: List[str]):
         self.allowed_list = allowed_list
 
-    def __call__(self, allowed_list: List[str], current_user: UserModel = Depends(get_current_user)):
-        pass
+    def __call__(self, current_user: UserModel = Depends(get_current_user)):
+        if current_user.role in self.allowed_list:
+            return True
+        
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not allowed to perform this operation"
+        )

@@ -9,6 +9,7 @@ class UserCreateModel(SQLModel):
 
 class UserModel(UserCreateModel):
     uid: uuid.UUID
+    role: str
     created_at: datetime 
 
 class UserUpdateModel(SQLModel):
