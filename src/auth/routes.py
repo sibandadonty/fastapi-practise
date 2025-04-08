@@ -9,14 +9,14 @@ from src.auth.utils import verify_password
 from src.auth.main import create_access_token
 from src.auth.dependencies import AccessTokenBearer, RefreshTokenBearer, get_current_user
 from src.auth.redis import add_token_to_blocklist
-from src.users.schemas import UserModel
+from src.users.schemas import UserBookModel, UserModel
 
 auth_router = APIRouter()
 user_service = UserService()
 access_token_bearer = AccessTokenBearer()
 refresh_token_bearer = RefreshTokenBearer()
 
-@auth_router.get("/me")
+@auth_router.get("/me", response_model=UserBookModel)
 async def get_current_user(user: UserModel = Depends(get_current_user)):
     return user
 
