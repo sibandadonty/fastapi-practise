@@ -7,13 +7,18 @@ from .schemas import UserLoginModel
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from src.auth.utils import verify_password
 from src.auth.main import create_access_token
-from src.auth.dependencies import AccessTokenBearer, RefreshTokenBearer
+from src.auth.dependencies import AccessTokenBearer, RefreshTokenBearer, get_current_user
 from src.auth.redis import add_token_to_blocklist
+from src.users.schemas import UserModel
 
 auth_router = APIRouter()
 user_service = UserService()
 access_token_bearer = AccessTokenBearer()
 refresh_token_bearer = RefreshTokenBearer()
+
+@auth_router.get("/me")
+async def get_current_user(user: UserModel = Depends(get_current_user)):
+    return user
 
 @auth_router.post("/login")
 async def login_user(login_data: UserLoginModel, session: AsyncSession = Depends(get_session)):
