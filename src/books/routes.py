@@ -18,9 +18,14 @@ not_found_exp = HTTPException(
 
 @book_router.post("/", response_model=BookModel, status_code=status.HTTP_201_CREATED, dependencies=[role_checker])
 async def create_book(book_data: BookCreateModel, session: AsyncSession = Depends(get_session), token_details: dict = Depends(access_token_bearer)):
-    print("Token Details: ", token_details)
-    new_book = await book_service.create_book(book_data, session)
+    user_uid = token_details.get("user")["uid"]
+    new_book = await book_service.create_book(user_uid, book_data, session)
     return new_book
+
+@book_router.get("/user_books/{user_uid}")
+async def get_user_books(user_uid: str, session: AsyncSession = Depends(get_session)):
+    user_books = await book_service.get_user_books(user_uid, session)
+    return user_books
 
 @book_router.get("/", dependencies=[role_checker])
 async def get_all_books(session: AsyncSession = Depends(get_session), token_details: dict = Depends(access_token_bearer)):
