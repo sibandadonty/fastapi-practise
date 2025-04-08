@@ -4,7 +4,9 @@ from src.auth.main import decode_token
 from src.auth.redis import token_in_blocklist
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from src.db.main import get_session
+from src.users.schemas import UserModel
 from src.users.services import UserService
+from typing import List
 
 user_service = UserService()
 
@@ -67,3 +69,10 @@ async def get_current_user(session: AsyncSession = Depends(get_session), token_d
     user = await user_service.get_user_by_email(email, session)
 
     return user
+
+class RoleChecker:
+    def __init__(self, allowed_list: List[str]):
+        self.allowed_list = allowed_list
+
+    def __call__(self, allowed_list: List[str], current_user: UserModel = Depends(get_current_user)):
+        pass

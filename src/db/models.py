@@ -39,6 +39,7 @@ class User(SQLModel, table=True):
     )
     username: str
     email: str
+    role: str = Field(sa_column=Column(pg.VARCHAR, server_default="user", nullable=False))
     password: str
     created_at: datetime = Field(sa_column=Column(pg.TIMESTAMP, default=datetime.now))
 
