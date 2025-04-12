@@ -7,6 +7,7 @@ from src.db.main import get_session
 from src.users.schemas import UserModel
 from src.users.services import UserService
 from typing import List
+from src.errors import AccessTokenRequired, RefreshTokenRequired
 
 user_service = UserService()
 
@@ -49,18 +50,12 @@ class TokenBearer(HTTPBearer):
 class AccessTokenBearer(TokenBearer):
     def verify_token_details(self, token_details):
         if token_details and token_details["refresh"]:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Please provide an access token"
-            )
+            raise AccessTokenRequired()
         
 class RefreshTokenBearer(TokenBearer):
     def verify_token_details(self, token_details):
         if token_details and not token_details["refresh"]:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Please provide a refresh token"
-            )
+            raise RefreshTokenRequired()
         
 
 async def get_current_user(session: AsyncSession = Depends(get_session), token_details: dict = Depends(AccessTokenBearer())):

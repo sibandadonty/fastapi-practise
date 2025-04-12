@@ -3,14 +3,12 @@ from .services import UserService
 from .schemas import UserCreateModel, UserUpdateModel, UserModel
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from src.db.main import get_session
+from src.errors import UserNotFound
 
 users_router = APIRouter()
 users_service = UserService()
 
-not_found_exp = HTTPException(
-    status_code=status.HTTP_404_NOT_FOUND,
-    detail="User not found"
-)
+not_found_exp = UserNotFound()
 
 @users_router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_user(user_data: UserCreateModel, session: AsyncSession = Depends(get_session)):
